@@ -56,7 +56,7 @@ class CodeGraphWindow(QMainWindow):
 
     def init_ui(self):
         """Initialize the UI"""
-        self.setWindowTitle('CodeGraph - Visual Code Navigator')
+        self.setWindowTitle('CodeGrapher - Visual Code Navigator')
         self.setGeometry(100, 100, 1400, 900)
         
         central_widget = QWidget()
