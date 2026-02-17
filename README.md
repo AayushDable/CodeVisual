@@ -1,6 +1,6 @@
-# CodeVisual
+# CodeGrapher
 
-A visual code navigation and documentation tool for Python projects. Create interactive flowcharts and diagrams to map out your codebase structure, functions, classes, and their relationships.
+A graphical code navigation and documentation tool for Python projects. Create interactive flowcharts and diagrams to map out your codebase structure, functions, classes, and their relationships.
 
 ## Features
 
