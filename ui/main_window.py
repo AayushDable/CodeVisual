@@ -1110,6 +1110,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': width,
             'height': height,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {
                 'isGroup': True
             },

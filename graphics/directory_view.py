@@ -123,7 +123,7 @@ class DirectoryGraphView(QGraphicsView):
             
             # Only show if dragged more than 20 pixels (avoid accidental tiny groups)
             if abs(x2 - x1) > 20 and abs(y2 - y1) > 20:
-                group_action = menu.addAction("📦 Group & Name")
+                group_action = menu.addAction("📦 Group")
                 group_action.triggered.connect(self.create_group_container)
                 menu.addSeparator()
         
