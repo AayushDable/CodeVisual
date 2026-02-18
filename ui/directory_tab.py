@@ -17,7 +17,7 @@ from graphics.code_block import CodeBlock
 
 
 
-from commands.graph_commands import AddConnectionCommand
+from commands.graph_commands import AddConnectionCommand,ChangeBlockStyleCommand
 
 
 
@@ -422,14 +422,24 @@ class DirectoryTab(QWidget):
             if color.isValid():
                 self.current_line_color = color
                 
-                # Apply to selected connections
                 selected_items = self.scene.selectedItems()
                 applied = False
                 for item in selected_items:
                     if isinstance(item, Connection):
                         item.set_line_color(color)
                         applied = True
-                
+                    elif isinstance(item, CodeBlock):
+                        old_style = {
+                            'color': QColor(item.style['color']),
+                            'border': QColor(item.style['border']),
+                            'alpha': item.style['alpha'],
+                            'dashed': item.style['dashed']
+                        }
+                        new_style = {**old_style, 'color': QColor(color)}
+                        cmd = ChangeBlockStyleCommand(item, old_style, new_style, "Change Block Color")
+                        self.parent_window.undo_stack.push(cmd)
+                        applied = True
+
                 if applied:
                     self.parent_window.statusBar().showMessage(
                         f'Color: Custom RGB({color.red()}, {color.green()}, {color.blue()})'
@@ -448,6 +458,18 @@ class DirectoryTab(QWidget):
                 if isinstance(item, Connection):
                     item.set_line_color(color_data)
                     self.parent_window.statusBar().showMessage(f'Color: {self.color_combo.currentText()}')
+                elif isinstance(item, CodeBlock):
+                    old_style = {
+                        'color': QColor(item.style['color']),
+                        'border': QColor(item.style['border']),
+                        'alpha': item.style['alpha'],
+                        'dashed': item.style['dashed']
+                    }
+                    new_style = {**old_style, 'color': QColor(color_data)}
+                    cmd = ChangeBlockStyleCommand(item, old_style, new_style, "Change Block Color")
+                    self.parent_window.undo_stack.push(cmd)
+                    self.parent_window.statusBar().showMessage(f'Color: {self.color_combo.currentText()}')
+
     
     def draw_directory_boundary(self):
         """Draw the directory block"""
@@ -515,6 +537,7 @@ class DirectoryTab(QWidget):
             block_data['y'],
             block_data['width'],
             block_data['height'],
+            block_data['style'],
             block_data.get('metadata', {}),
             scene_manager=self,
             exists=block_data.get('exists', True)  # Load exists state

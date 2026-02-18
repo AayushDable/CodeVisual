@@ -753,6 +753,12 @@ class CodeGraphWindow(QMainWindow):
             'metadata': {
                 'functionName': name
             },
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'exists': exists
         }
         
@@ -804,6 +810,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': 200,
             'height': 80,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {},
             'exists': True  # Always exists (no validation needed)
         }
@@ -858,6 +870,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': 300,  # Larger default for images
             'height': 300,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {'image_path': path},
             'exists': True
         }
@@ -916,6 +934,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': 250,
             'height': 100,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {
                 'className': name
             },
@@ -990,6 +1014,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': 200,
             'height': 80,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {
                 'methodName': name
             },
@@ -1045,6 +1075,12 @@ class CodeGraphWindow(QMainWindow):
             'y': y,
             'width': 250,
             'height': 100,
+            'style': {
+                'color': (None,None,None),
+                'border': (None,None,None,None),
+                'alpha': None,
+                'dashed': None,
+            },
             'metadata': {},
             'exists': exists
         }

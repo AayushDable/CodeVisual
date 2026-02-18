@@ -282,3 +282,33 @@ class RenameBlockCommand(QUndoCommand):
     def undo(self):
         """Restore old name"""
         self.block.set_alias(self.old_name)
+
+class ChangeBlockStyleCommand(QUndoCommand):
+    def __init__(self, block, old_style, new_style, description="Change Block Style"):
+        super().__init__(description)
+        self.block = block
+        self.old_style = {
+            'color': QColor(old_style['color']),
+            'border': QColor(old_style['border']),
+            'alpha': old_style['alpha'],
+            'dashed': old_style['dashed']
+        }
+        self.new_style = {
+            'color': QColor(new_style['color']),
+            'border': QColor(new_style['border']),
+            'alpha': new_style['alpha'],
+            'dashed': new_style['dashed']
+        }
+
+    def redo(self):
+        self._apply_style(self.new_style)
+
+    def undo(self):
+        self._apply_style(self.old_style)
+
+    def _apply_style(self, style):
+        self.block.style['color'] = QColor(style['color'])
+        self.block.style['border'] = QColor(style['border'])
+        self.block.style['alpha'] = style['alpha']
+        self.block.style['dashed'] = style['dashed']
+        self.block.update_style()

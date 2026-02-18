@@ -129,24 +129,24 @@ class CodeBlock(QGraphicsRectItem):
     """Represents a function, subdirectory, or class block"""
     
     BLOCK_TYPES = {
-        'FUNCTION': {'color': QColor(255, 255, 255), 'border': QColor(0, 0, 0), 
+        'FUNCTION': {'color': QColor(255, 255, 255), 'border': QColor(0, 0, 0, 100), 
                     'alpha': 255, 'dashed': False},
-        'SUBDIRECTORY': {'color': QColor(30, 58, 95), 'border': QColor(13, 31, 60), 
+        'SUBDIRECTORY': {'color': QColor(30, 58, 95), 'border': QColor(13, 31, 60, 100), 
                         'alpha': 180, 'dashed': True},
-        'CLASS': {'color': QColor(255, 250, 205), 'border': QColor(218, 165, 32), 
+        'CLASS': {'color': QColor(255, 250, 205), 'border': QColor(218, 165, 32, 100), 
                 'alpha': 200, 'dashed': True},
-        'METHOD': {'color': QColor(230, 200, 255), 'border': QColor(138, 43, 226), 
+        'METHOD': {'color': QColor(230, 200, 255), 'border': QColor(138, 43, 226, 100), 
                 'alpha': 255, 'dashed': False},
-        'OTHER': {'color': QColor(200, 200, 200), 'border': QColor(128, 128, 128), 
+        'OTHER': {'color': QColor(200, 200, 200), 'border': QColor(128, 128, 128, 100), 
                 'alpha': 200, 'dashed': False},
-        'GROUP': {'color': QColor(220, 240, 255), 'border': QColor(100, 150, 200), 
+        'GROUP': {'color': QColor(220, 240, 255), 'border': QColor(100, 150, 200, 100), 
                 'alpha': 100, 'dashed': True},  # Light blue, semi-transparent
         'IMAGE': {'color': QColor(255, 255, 255), 'border': QColor(100, 100, 100, 0), 
                 'alpha': 0, 'dashed': False},  # No background for images
     }
 
 
-    def __init__(self, block_id, block_type, name, x, y, width, height, metadata=None, scene_manager=None, exists=True):
+    def __init__(self, block_id, block_type, name, x, y, width, height, style, metadata=None, scene_manager=None, exists=True):
         super().__init__(0, 0, width, height)
         
         self.block_id = block_id
@@ -161,6 +161,11 @@ class CodeBlock(QGraphicsRectItem):
         self.image_item = None
         self.image_path = metadata.get('image_path', '') if metadata else ''
 
+        self.block_color = None
+        self.block_border_color = None
+        
+        self.style = {}
+        
         if block_type == 'GROUP':
             self.setZValue(-2)  # Behind directory boundary (-1)
 
@@ -176,6 +181,7 @@ class CodeBlock(QGraphicsRectItem):
         
         self.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
         
+        self.load_style_settings(style)
         self.update_style()
 
         if block_type == 'IMAGE':
@@ -203,7 +209,25 @@ class CodeBlock(QGraphicsRectItem):
         """Set whether this block exists in filesystem and update style"""
         self.exists = exists
         self.update_style()
-    
+
+    def load_style_settings(self,style):
+        if style['color'] == (None,None,None):
+            self.style['color'] = self.BLOCK_TYPES[self.block_type]['color']
+        else:
+            self.style['color'] = QColor(style['color'][0],style['color'][1],style['color'][2])
+        if style['border'] == (None,None,None,None):
+            self.style['border'] = self.BLOCK_TYPES[self.block_type]['border']
+        else:
+            self.style['border'] = QColor(style['border'][0],style['border'][1],style['border'][2],style['border'][3])
+        if style['alpha'] == None:
+            self.style['alpha'] = self.BLOCK_TYPES[self.block_type]['alpha']
+        else:
+            self.style['alpha'] = style['alpha']
+        if style['dashed'] == None:
+            self.style['dashed'] = self.BLOCK_TYPES[self.block_type]['dashed']
+        else:
+            self.style['dashed'] = style['dashed']
+
     def create_resize_handles(self):
         """Create resize handles at corners"""
         positions = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
@@ -411,10 +435,9 @@ class CodeBlock(QGraphicsRectItem):
     
     def update_style(self):
         """Update block visual style"""
-        style = self.BLOCK_TYPES[self.block_type]
         
-        color = QColor(style['color'])
-        color.setAlpha(style['alpha'])
+        color = QColor(self.style['color'])
+        color.setAlpha(self.style['alpha'])
         self.setBrush(QBrush(color))
         
         # Use red border if doesn't exist, otherwise normal border
@@ -423,17 +446,27 @@ class CodeBlock(QGraphicsRectItem):
             pen = QPen(border_color)
             pen.setWidth(3)  # Thicker for visibility
         else:
-            border_color = style['border']
+            border_color = self.style['border']
             pen = QPen(border_color)
             pen.setWidth(2)
         
-        if style['dashed']:
+        if self.style['dashed']:
             pen.setStyle(Qt.DashLine)
         
         self.setPen(pen)
     
     def to_dict(self):
         """Convert block to dictionary"""
+
+        # Fixed — preserves alpha
+        style_dict = {
+            'color': (self.style['color'].red(), self.style['color'].green(), self.style['color'].blue()),
+            'border': (self.style['border'].red(), self.style['border'].green(), self.style['border'].blue(), self.style['border'].alpha()),
+            'alpha': self.style['alpha'],
+            'dashed': self.style['dashed']
+        }
+
+
         return {
             'id': self.block_id,
             'type': self.block_type,
@@ -442,6 +475,7 @@ class CodeBlock(QGraphicsRectItem):
             'y': self.pos().y(),
             'width': self.rect().width(),
             'height': self.rect().height(),
+            'style': style_dict,
             'metadata': self.metadata,
             'exists': self.exists  # Save existence state
         }
